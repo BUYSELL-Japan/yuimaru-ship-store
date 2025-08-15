@@ -1,0 +1,26 @@
+{
+  "name": "Yuimaru Ship - 店舗管理画面",
+  "short_name": "Yuimaru Ship",
+  "description": "効率的な店舗管理システム",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://mopimages.s3.ap-southeast-2.amazonaws.com/yuimaru.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://mopimages.s3.ap-southeast-2.amazonaws.com/yuimaru.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "lang": "ja"
+}
