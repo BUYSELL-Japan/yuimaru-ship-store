@@ -70,7 +70,7 @@ export const useAuth = () => {
           grant_type: 'authorization_code',
           client_id: '4nko3uuuls303nefg9b9ot9g9p',
           code: code,
-          redirect_uri: 'https://store.yuimaru-ship.online',
+          redirect_uri: 'https://shop.yuimaru-ship.online',
         }),
       });
 
@@ -343,7 +343,7 @@ export const useAuth = () => {
     });
 
     // Cognitoのログアウトエンドポイントにリダイレクト
-    const logoutUrl = `https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/logout?client_id=4nko3uuuls303nefg9b9ot9g9p&logout_uri=${encodeURIComponent('https://store.yuimaru-ship.online')}`;
+    const logoutUrl = `https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/logout?client_id=4nko3uuuls303nefg9b9ot9g9p&logout_uri=${encodeURIComponent('https://shop.yuimaru-ship.online')}`;
     window.location.href = logoutUrl;
   };
 
