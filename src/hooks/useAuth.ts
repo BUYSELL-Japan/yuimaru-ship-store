@@ -4,24 +4,28 @@ interface User {
   email: string;
   name: string;
   sub: string;
+  store_id?: string;
 }
 
 interface AuthState {
   isAuthenticated: boolean;
   user: User | null;
   isLoading: boolean;
+  storeId: string | null;
 }
 
 const COGNITO_LOGIN_URL = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/login?client_id=4nko3uuuls303nefg9b9ot9g9p&response_type=code&scope=email+https%3A%2F%2F9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com%2Fprod%2Fstore_id+openid+profile&redirect_uri=https%3A%2F%2Fshop.yuimaru-ship.online';
 const TOKEN_ENDPOINT = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/oauth2/token';
 const USER_INFO_ENDPOINT = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/oauth2/userInfo';
 const LINK_USER_STORE_ENDPOINT = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/register-store/link-user-to-store';
+const GET_USER_STORE_ENDPOINT = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/register-store/get-user-store';
 
 export const useAuth = () => {
   const [authState, setAuthState] = useState<AuthState>({
     isAuthenticated: false,
     user: null,
     isLoading: true,
+    storeId: null,
   });
 
   useEffect(() => {
@@ -110,14 +114,19 @@ export const useAuth = () => {
 
       const userInfo = await response.json();
       
+      // ユーザー情報取得後、store_idも取得
+      const storeId = await fetchUserStoreId(userInfo.sub);
+      
       setAuthState({
         isAuthenticated: true,
         user: {
           email: userInfo.email,
           name: userInfo.name || userInfo.email,
           sub: userInfo.sub,
+          store_id: storeId,
         },
         isLoading: false,
+        storeId: storeId,
       });
     } catch (error) {
       console.error('Failed to fetch user info:', error);
@@ -125,6 +134,27 @@ export const useAuth = () => {
     }
   };
 
+  const fetchUserStoreId = async (sub: string): Promise<string | null> => {
+    try {
+      const response = await fetch(`${GET_USER_STORE_ENDPOINT}?sub=${encodeURIComponent(sub)}`, {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        return data.store_id || null;
+      } else {
+        console.log('Store ID not found for user');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching user store ID:', error);
+      return null;
+    }
+  };
   const linkUserToStore = async (idToken: string) => {
     try {
       // IDトークンからsubを取得
@@ -148,6 +178,13 @@ export const useAuth = () => {
 
       if (response.status === 200) {
         console.log('User successfully linked to store');
+        // 紐付け成功後、store_idを再取得
+        const storeId = await fetchUserStoreId(sub);
+        setAuthState(prev => ({
+          ...prev,
+          storeId: storeId,
+          user: prev.user ? { ...prev.user, store_id: storeId } : null,
+        }));
         return;
       } else if (response.status === 400) {
         // ストアIDの入力を求める
@@ -293,6 +330,13 @@ export const useAuth = () => {
           if (response.status === 200) {
             alert('ストアIDの紐付けが完了しました！');
             document.body.removeChild(modal);
+            // 紐付け成功後、store_idを再取得
+            const newStoreId = await fetchUserStoreId(sub);
+            setAuthState(prev => ({
+              ...prev,
+              storeId: newStoreId,
+              user: prev.user ? { ...prev.user, store_id: newStoreId } : null,
+            }));
             resolve();
           } else {
             const errorText = await response.text();
@@ -340,6 +384,7 @@ export const useAuth = () => {
       isAuthenticated: false,
       user: null,
       isLoading: false,
+      storeId: null,
     });
 
     // Cognitoのログアウトエンドポイントにリダイレクト

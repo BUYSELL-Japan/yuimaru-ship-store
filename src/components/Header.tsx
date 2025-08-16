@@ -20,7 +20,11 @@ export const Header: React.FC<HeaderProps> = ({ storeId, user, onLogout }) => {
             <div>
               <h1 className="text-xl font-bold text-gray-900">Yuimaru Ship</h1>
               <p className="text-sm text-gray-600">
-                店舗管理画面 {storeId && `- ${storeId}`}
+                店舗管理画面 {storeId && (
+                  <span className={`font-medium ${user ? 'text-green-600' : 'text-blue-600'}`}>
+                    - {storeId} {user ? '(認証済み)' : '(デモ)'}
+                  </span>
+                )}
               </p>
             </div>
           </div>
