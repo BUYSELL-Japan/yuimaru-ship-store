@@ -10,7 +10,7 @@
   "icons": [
     {
       "src": "https://mopimages.s3.ap-southeast-2.amazonaws.com/yuimaru.jpg",
-      "sizes": "192x192",
+      "sizes": "512x512",
       "type": "image/jpeg",
       "purpose": "any maskable"
     },

@@ -5,7 +5,7 @@ yarn-debug.log*
 yarn-error.log*
 
 # Production builds
-# dist/  <-- この行を削除
+dist/
 build/
 
 # Environment variables
@@ -60,20 +60,3 @@ jspm_packages/
 
 # Bolt specific
 .bolt/
-
-# 追加: macOS、Linux、Windowsのシステムファイル
-*.swp
-*.swo
-.DS_Store
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
-
-# 追加: Vercel/Netlify のデプロイ時に生成されるディレクトリ
-.vercel
-.netlify
-
-# 追加: その他の一般的なビルドディレクトリ
-*.vite
-.vite
