@@ -14,9 +14,17 @@ export default defineConfig({
         entryFileNames: 'assets/[name]-[hash].js',
         chunkFileNames: 'assets/[name]-[hash].js',
         assetFileNames: 'assets/[name]-[hash].[ext]',
-        manualChunks: undefined,
+        manualChunks: {
+          vendor: ['react', 'react-dom'],
+          icons: ['lucide-react'],
+        },
+      },
+      treeshake: {
+        moduleSideEffects: false,
       },
     },
+    target: 'es2020',
+    cssCodeSplit: true,
   },
   server: {
     port: 5173,
