@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { Header } from './components/Header';
 import { OrderCard } from './components/OrderCard';
 import { StatsCard } from './components/StatsCard';
@@ -42,7 +42,7 @@ function App() {
     }
   };
 
-  const handleOrderDataUpdate = async (
+  const handleOrderDataUpdate = useCallback(async (
     orderId: string, 
     finalWeight?: number, 
     totalPrice?: number, 
@@ -95,17 +95,19 @@ function App() {
       alert('データの更新に失敗しました。もう一度お試しください。');
       throw error; // OrderCardでエラーハンドリングするために再スロー
     }
-  };
+  }, [storeId]);
 
   // Filter out empty orders for stats calculation
-  const validOrders = orders.filter(order => order.order_id);
-
-  const stats = {
-    totalOrders: validOrders.length,
-    pendingOrders: validOrders.filter(o => !o.final_weight || !o.total_price || !o.parcels?.[0]?.length).length,
-    processingOrders: validOrders.filter(o => o.final_weight && o.total_price && o.parcels?.[0]?.length).length,
-    shippedOrders: 0, // Firebase response doesn't include status, so we'll set this to 0
-  };
+  const stats = useMemo(() => {
+    const validOrders = orders.filter(order => order.order_id);
+    
+    return {
+      totalOrders: validOrders.length,
+      pendingOrders: validOrders.filter(o => !o.final_weight || !o.total_price || !o.parcels?.[0]?.length).length,
+      processingOrders: validOrders.filter(o => o.final_weight && o.total_price && o.parcels?.[0]?.length).length,
+      shippedOrders: 0, // Firebase response doesn't include status, so we'll set this to 0
+    };
+  }, [orders]);
 
   // 認証チェック中の表示
   if (authLoading) {

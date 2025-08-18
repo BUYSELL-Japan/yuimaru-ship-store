@@ -7,7 +7,7 @@ interface HeaderProps {
   onLogout?: () => void;
 }
 
-export const Header: React.FC<HeaderProps> = ({ storeId, user, onLogout }) => {
+export const Header: React.FC<HeaderProps> = React.memo(({ storeId, user, onLogout }) => {
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -74,4 +74,4 @@ export const Header: React.FC<HeaderProps> = ({ storeId, user, onLogout }) => {
       </div>
     </header>
   );
-};
+});
