@@ -48,7 +48,11 @@ export const useAuth = () => {
       // 既存のトークンをチェック
       const accessToken = localStorage.getItem('access_token');
       if (accessToken) {
-        await fetchUserInfo(accessToken);
+        const user = await fetchUserInfo(accessToken);
+        // ユーザー情報取得後、店舗IDも取得
+        if (user) {
+          await fetchStoreId(user.sub);
+        }
       } else {
         setAuthState({
           isAuthenticated: false,
@@ -138,6 +142,37 @@ export const useAuth = () => {
     }
   };
 
+  const fetchStoreId = async (sub: string) => {
+    try {
+      console.log('Fetching store ID for sub:', sub);
+
+      const response = await fetch(LINK_USER_STORE_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ sub }),
+      });
+
+      if (response.status === 200) {
+        const data = await response.json();
+        console.log('Store ID fetched:', data);
+
+        if (data.store_id) {
+          setAuthState(prev => ({
+            ...prev,
+            storeId: data.store_id,
+          }));
+        }
+      } else if (response.status === 400) {
+        console.log('Store ID not found for user');
+        // 店舗IDが未設定の場合はnullのまま
+      }
+    } catch (error) {
+      console.error('Error fetching store ID:', error);
+    }
+  };
+
   const linkUserToStore = async (sub: string) => {
     try {
       if (!sub) {
@@ -159,7 +194,17 @@ export const useAuth = () => {
       console.log('Link user to store response status:', response.status);
 
       if (response.status === 200) {
-        console.log('User successfully linked to store');
+        const data = await response.json();
+        console.log('User successfully linked to store, response:', data);
+
+        // レスポンスから店舗IDを取得してステートに保存
+        if (data.store_id) {
+          setAuthState(prev => ({
+            ...prev,
+            storeId: data.store_id,
+          }));
+          console.log('Store ID set to:', data.store_id);
+        }
         return;
       } else if (response.status === 400) {
         // ストアIDの入力を求める
