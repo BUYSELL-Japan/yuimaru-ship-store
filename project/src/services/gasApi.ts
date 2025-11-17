@@ -55,18 +55,67 @@ export interface Setup {
 export interface OrderData {
   store_id: string;
   order_id: string;
+  shipment_id?: string;
   setup: Setup;
-  from_address: FromAddress;
+  from_address?: FromAddress;
   to_address: ToAddress;
   products: Product[];
   parcels: Parcel[];
+  parcel?: Parcel;
   total_price?: string;
   final_weight?: string;
   status?: string;
+  order_status?: string;
   totalWeight?: number; // アプリ内で使用する重量フィールド
+  customs?: any;
 }
 
-// フラット構造をネスト構造に変換する関数
+// 新しいAPIレスポンス形式を変換する関数
+const transformApiResponse = (apiData: any): OrderData => {
+  // shipment_idをorder_idとして使用
+  const orderId = apiData.shipment_id || apiData.order_id || '';
+
+  // parcel(単数)をparcels(配列)に変換
+  const parcels = [];
+  if (apiData.parcel) {
+    parcels.push({
+      weight: apiData.parcel.weight?.toString() || '',
+      length: apiData.parcel.length?.toString() || '',
+      width: apiData.parcel.width?.toString() || '',
+      height: apiData.parcel.height?.toString() || '',
+    });
+  }
+
+  // 重量をグラムからキログラムに変換
+  let totalWeight: number | undefined;
+  if (apiData.parcel?.weight && apiData.parcel.weight_unit === 'g') {
+    totalWeight = apiData.parcel.weight / 1000;
+  } else if (apiData.parcel?.weight) {
+    totalWeight = apiData.parcel.weight;
+  }
+
+  const transformed: OrderData = {
+    store_id: apiData.store_id,
+    order_id: orderId,
+    shipment_id: apiData.shipment_id,
+    setup: apiData.setup || {},
+    from_address: apiData.from_address || {},
+    to_address: apiData.to_address || {},
+    products: apiData.products || [],
+    parcels: parcels,
+    parcel: apiData.parcel,
+    total_price: apiData.customs?.total_value?.toString() || apiData.total_price,
+    final_weight: totalWeight?.toString(),
+    status: apiData.order_status || apiData.status,
+    order_status: apiData.order_status,
+    totalWeight: totalWeight,
+    customs: apiData.customs,
+  };
+
+  return transformed;
+};
+
+// フラット構造をネスト構造に変換する関数（旧形式用に残す）
 const transformFlatToNested = (flatData: any): OrderData => {
   const nested: any = {
     store_id: flatData.store_id,
@@ -89,7 +138,7 @@ const transformFlatToNested = (flatData: any): OrderData => {
   // フラットなキーを処理
   Object.keys(flatData).forEach(key => {
     const value = flatData[key];
-    
+
     if (key.startsWith('setup.')) {
       const setupKey = key.replace('setup.', '');
       nested.setup[setupKey] = value;
@@ -105,12 +154,12 @@ const transformFlatToNested = (flatData: any): OrderData => {
       if (match) {
         const index = parseInt(match[1]);
         const productKey = match[2];
-        
+
         // 配列のインデックスが存在しない場合は初期化
         if (!nested.products[index]) {
           nested.products[index] = {};
         }
-        
+
         // quantityは数値に変換
         if (productKey === 'quantity' && value) {
           nested.products[index][productKey] = parseInt(value) || 0;
@@ -124,12 +173,12 @@ const transformFlatToNested = (flatData: any): OrderData => {
       if (match) {
         const index = parseInt(match[1]);
         const parcelKey = match[2];
-        
+
         // 配列のインデックスが存在しない場合は初期化
         if (!nested.parcels[index]) {
           nested.parcels[index] = {};
         }
-        
+
         nested.parcels[index][parcelKey] = value;
       }
     }
@@ -167,10 +216,17 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
       return [];
     }
 
-    // フラット構造をネスト構造に変換
-    const transformedData = data.map(transformFlatToNested);
+    // 新しいAPI形式を変換
+    const transformedData = data.map((item: any) => {
+      // 新しい形式かフラット形式か判定
+      if (item.shipment_id || item.parcel) {
+        return transformApiResponse(item);
+      } else {
+        return transformFlatToNested(item);
+      }
+    });
     console.log('Transformed Data:', transformedData);
-    
+
     return transformedData;
   } catch (error) {
     console.error('Error fetching orders from API Gateway:', error);
