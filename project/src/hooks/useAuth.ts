@@ -90,10 +90,12 @@ export const useAuth = () => {
       localStorage.setItem('id_token', tokenData.id_token);
 
       // ユーザー情報を取得
-      await fetchUserInfo(tokenData.access_token);
-      
+      const user = await fetchUserInfo(tokenData.access_token);
+
       // ユーザーと店舗の紐付け処理
-      await linkUserToStore(tokenData.id_token);
+      if (user) {
+        await linkUserToStore(user.sub);
+      }
     } catch (error) {
       console.error('Token exchange error:', error);
       throw error;
@@ -115,36 +117,36 @@ export const useAuth = () => {
 
       const userInfo = await response.json();
       console.log('User info received:', userInfo);
-      
+
+      const user = {
+        email: userInfo.email,
+        name: userInfo.name || userInfo.email,
+        sub: userInfo.sub,
+      };
+
       setAuthState({
         isAuthenticated: true,
-        user: {
-          email: userInfo.email,
-          name: userInfo.name || userInfo.email,
-          sub: userInfo.sub,
-        },
+        user,
         isLoading: false,
         storeId: null,
       });
+
+      return user;
     } catch (error) {
       console.error('Failed to fetch user info:', error);
       throw error;
     }
   };
 
-  const linkUserToStore = async (idToken: string) => {
+  const linkUserToStore = async (sub: string) => {
     try {
-      // IDトークンからsubを取得
-      const payload = JSON.parse(atob(idToken.split('.')[1]));
-      const sub = payload.sub;
-      
       if (!sub) {
-        throw new Error('Sub not found in ID token');
+        throw new Error('Sub is required');
       }
 
       console.log('Linking user to store with sub:', sub);
       console.log('Using endpoint:', LINK_USER_STORE_ENDPOINT);
-      
+
       // 最初のリクエスト（subのみ）
       const response = await fetch(LINK_USER_STORE_ENDPOINT, {
         method: 'POST',
