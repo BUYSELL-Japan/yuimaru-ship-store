@@ -14,7 +14,7 @@ interface AuthState {
   storeId: string | null;
 }
 
-const COGNITO_LOGIN_URL = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/login?client_id=4nko3uuuls303nefg9b9ot9g9p&response_type=code&scope=email+openid+profile&redirect_uri=https%3A%2F%2Fshop.yuimaru-ship.box-pals.com%2F';
+const COGNITO_LOGIN_URL = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/login?client_id=12nf22nqg8mpcq1q77nm5uqbls&response_type=code&scope=email+openid+profile&redirect_uri=https%3A%2F%2Fshop.yuimaru-ship.box-pals.com%2F';
 const TOKEN_ENDPOINT = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/oauth2/token';
 const USER_INFO_ENDPOINT = 'https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/oauth2/userInfo';
 const LINK_USER_STORE_ENDPOINT = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/register-store/link-user-to-store';
@@ -76,7 +76,7 @@ export const useAuth = () => {
         },
         body: new URLSearchParams({
           grant_type: 'authorization_code',
-          client_id: '4nko3uuuls303nefg9b9ot9g9p',
+          client_id: '12nf22nqg8mpcq1q77nm5uqbls',
           code: code,
           redirect_uri: 'https://shop.yuimaru-ship.box-pals.com/',
         }),
@@ -406,7 +406,7 @@ export const useAuth = () => {
     });
 
     // Cognitoのログアウトエンドポイントにリダイレクト
-    const logoutUrl = `https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/logout?client_id=4nko3uuuls303nefg9b9ot9g9p&logout_uri=${encodeURIComponent('https://shop.yuimaru-ship.box-pals.com/')}`;
+    const logoutUrl = `https://ap-southeast-2usngbi9wi.auth.ap-southeast-2.amazoncognito.com/logout?client_id=12nf22nqg8mpcq1q77nm5uqbls&logout_uri=${encodeURIComponent('https://shop.yuimaru-ship.box-pals.com/')}`;
     window.location.href = logoutUrl;
   };
 
