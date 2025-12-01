@@ -196,19 +196,19 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
     const url = `${GET_ORDERS_BASE_URL}?store_id=${encodeURIComponent(storeId)}`;
     console.log('Fetching orders from API Gateway:', url);
 
-    const accessToken = localStorage.getItem('access_token');
-    console.log('Access token available:', !!accessToken);
-    console.log('Access token preview:', accessToken?.substring(0, 50) + '...');
+    const idToken = localStorage.getItem('id_token');
+    console.log('ID token available:', !!idToken);
+    console.log('ID token preview:', idToken?.substring(0, 50) + '...');
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
-      console.log('Authorization header set');
+    if (idToken) {
+      headers['Authorization'] = `Bearer ${idToken}`;
+      console.log('Authorization header set with ID token');
     } else {
-      console.warn('No access token found in localStorage');
+      console.warn('No ID token found in localStorage');
     }
 
     console.log('Request headers:', headers);
@@ -283,13 +283,13 @@ export const updateOrderDataInGAS = async (
     }
 
     // デバッグ用ログ出力
-    const accessToken = localStorage.getItem('access_token');
+    const idToken = localStorage.getItem('id_token');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
-    if (accessToken) {
-      headers['Authorization'] = `Bearer ${accessToken}`;
+    if (idToken) {
+      headers['Authorization'] = `Bearer ${idToken}`;
     }
 
     console.log('=== POST Request Debug Info ===');
