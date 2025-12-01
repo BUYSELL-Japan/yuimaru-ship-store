@@ -87,11 +87,20 @@ export const useAuth = () => {
       }
 
       const tokenData = await response.json();
-      
+
+      console.log('Token data received:', {
+        has_access_token: !!tokenData.access_token,
+        has_refresh_token: !!tokenData.refresh_token,
+        has_id_token: !!tokenData.id_token
+      });
+
       // トークンを保存
       localStorage.setItem('access_token', tokenData.access_token);
       localStorage.setItem('refresh_token', tokenData.refresh_token);
       localStorage.setItem('id_token', tokenData.id_token);
+
+      console.log('Tokens saved to localStorage');
+      console.log('Access token from localStorage:', localStorage.getItem('access_token')?.substring(0, 50) + '...');
 
       // ユーザー情報を取得
       const user = await fetchUserInfo(tokenData.access_token);

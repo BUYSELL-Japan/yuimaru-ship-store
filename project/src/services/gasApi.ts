@@ -197,13 +197,21 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
     console.log('Fetching orders from API Gateway:', url);
 
     const accessToken = localStorage.getItem('access_token');
+    console.log('Access token available:', !!accessToken);
+    console.log('Access token preview:', accessToken?.substring(0, 50) + '...');
+
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
     if (accessToken) {
       headers['Authorization'] = `Bearer ${accessToken}`;
+      console.log('Authorization header set');
+    } else {
+      console.warn('No access token found in localStorage');
     }
+
+    console.log('Request headers:', headers);
 
     const response = await fetch(url, {
       method: 'GET',
