@@ -195,12 +195,19 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
   try {
     const url = `${GET_ORDERS_BASE_URL}?store_id=${encodeURIComponent(storeId)}`;
     console.log('Fetching orders from API Gateway:', url);
-    
+
+    const accessToken = localStorage.getItem('access_token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
     const response = await fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
     });
 
     if (!response.ok) {
@@ -268,19 +275,24 @@ export const updateOrderDataInGAS = async (
     }
 
     // デバッグ用ログ出力
+    const accessToken = localStorage.getItem('access_token');
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+
+    if (accessToken) {
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+
     console.log('=== POST Request Debug Info ===');
     console.log('URL:', url);
     console.log('Request Body:', JSON.stringify(requestBody, null, 2));
-    console.log('Headers:', {
-      'Content-Type': 'application/json',
-    });
+    console.log('Headers:', headers);
     console.log('===============================');
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(requestBody)
     });
 
