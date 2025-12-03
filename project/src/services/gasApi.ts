@@ -224,15 +224,18 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
 
     const data = await response.json();
     console.log('API Gateway Response (Raw):', data);
-    
-    // API Gatewayからのレスポンスが配列でない場合の処理
-    if (!Array.isArray(data)) {
-      console.warn('API Gateway response is not an array:', data);
+
+    // レスポンスがオブジェクトで shipments プロパティを持つ場合
+    const shipments = data.shipments || [];
+    console.log('Shipments extracted:', shipments);
+
+    if (!Array.isArray(shipments)) {
+      console.warn('shipments is not an array:', shipments);
       return [];
     }
 
     // 新しいAPI形式を変換
-    const transformedData = data.map((item: any) => {
+    const transformedData = shipments.map((item: any) => {
       // 新しい形式かフラット形式か判定
       if (item.shipment_id || item.parcel) {
         return transformApiResponse(item);
