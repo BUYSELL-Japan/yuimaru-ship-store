@@ -253,37 +253,40 @@ export const fetchOrdersFromGAS = async (storeId: string): Promise<OrderData[]> 
 };
 
 export const updateOrderDataInGAS = async (
-  storeId: string, 
-  orderId: string, 
-  finalWeight?: number, 
+  storeId: string,
+  orderId: string,
+  finalWeight?: number,
   totalPrice?: number,
   boxSize?: { length: number; width: number; height: number }
 ): Promise<void> => {
   try {
     const url = SUBMIT_ORDER_BASE_URL;
-    
+
     const requestBody: any = {
       store_id: storeId,
-      order_id: orderId,
-      action: 'updateOrderData'
+      shipment_id: orderId
     };
 
-    // final_weightが指定されている場合は追加
+    // total_weightが指定されている場合は追加（kgをグラムに変換）
     if (finalWeight !== undefined) {
-      requestBody.final_weight = finalWeight.toString();
+      requestBody.total_weight = Math.round(finalWeight * 1000);
     }
 
-    // total_priceが指定されている場合は追加
+    // total_priceが指定されている場合は追加（数値型）
     if (totalPrice !== undefined) {
-      requestBody.total_price = totalPrice.toString();
+      requestBody.total_price = totalPrice;
     }
 
-    // 箱サイズが指定されている場合は追加
+    // 箱サイズが指定されている場合は追加（数値型）
     if (boxSize) {
-      requestBody['parcels[0].length'] = boxSize.length.toString();
-      requestBody['parcels[0].width'] = boxSize.width.toString();
-      requestBody['parcels[0].height'] = boxSize.height.toString();
+      requestBody.box_length = boxSize.length;
+      requestBody.box_width = boxSize.width;
+      requestBody.box_height = boxSize.height;
     }
+
+    // shipment_dateを追加（YYYY-MM-DD形式）
+    const today = new Date();
+    requestBody.shipment_date = today.toISOString().split('T')[0];
 
     // デバッグ用ログ出力
     const idToken = localStorage.getItem('id_token');
