@@ -1,5 +1,5 @@
 const GET_ORDERS_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/shipments';
-const SUBMIT_ORDER_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/register-store/link-user-to-store';
+const SUBMIT_ORDER_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/orders';
 
 export interface ToAddress {
   full_name: string;
