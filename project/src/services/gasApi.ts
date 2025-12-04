@@ -1,5 +1,5 @@
 const GET_ORDERS_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/shipments';
-const SUBMIT_ORDER_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod/orders';
+const API_BASE_URL = 'https://9xylwit7o5.execute-api.ap-southeast-2.amazonaws.com/prod';
 
 export interface ToAddress {
   full_name: string;
@@ -260,7 +260,7 @@ export const updateOrderDataInGAS = async (
   boxSize?: { length: number; width: number; height: number }
 ): Promise<void> => {
   try {
-    const url = SUBMIT_ORDER_BASE_URL;
+    const url = `${API_BASE_URL}/shipments/${encodeURIComponent(orderId)}`;
 
     const requestBody: any = {
       store_id: storeId,
